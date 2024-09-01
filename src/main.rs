@@ -3,12 +3,13 @@ use bmp::Image;
 use num_complex::Complex64 as Complex;
 
 fn pixel_to_complex(pixel_x: u32, pixel_y: u32, width: u32, height: u32) -> Complex {
-    const COMPLEX_BOTTOM_LEFT: Complex = Complex::new(-2.0, -2.0);
-    const COMPLEX_TOP_RIGHT: Complex = Complex::new(2.0, 2.0);
-    let delta = COMPLEX_TOP_RIGHT - COMPLEX_BOTTOM_LEFT;
-    let dx_per_pixel = delta.re / width as f64;
-    let dy_per_pixel = delta.im / height as f64;
-    Complex::new(pixel_x as f64 * dx_per_pixel, pixel_y as f64 * dy_per_pixel) + COMPLEX_BOTTOM_LEFT
+    const X_MIN: f64 = -2.5;
+    const DX: f64 = 3.5;
+    let dx_per_pixel = DX / width as f64;
+    let y = -(pixel_y as f64 - height as f64 / 2.0) * dx_per_pixel;
+    let x = pixel_x as f64 * dx_per_pixel + X_MIN;
+
+    Complex::new(x, y)
 }
 
 fn steps_until_divergence(initial_value: Complex, shift: Complex) -> Option<u32> {
