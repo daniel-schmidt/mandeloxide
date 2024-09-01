@@ -11,15 +11,25 @@ fn pixel_to_complex(pixel_x: u32, pixel_y: u32, width: u32, height: u32) -> Comp
     Complex::new(pixel_x as f64 * dx_per_pixel, pixel_y as f64 * dy_per_pixel) + COMPLEX_BOTTOM_LEFT
 }
 
-fn steps_until_divergence(initial_value: Complex, shift: Complex) -> Option<u8> {
+fn steps_until_divergence(initial_value: Complex, shift: Complex) -> Option<u32> {
     let mut z = initial_value;
-    for step_count in 0..100 {
+    for step_count in 0..1000 {
         if z.norm_sqr() > 4.0 {
             return Some(step_count);
         }
         z = z * z + shift;
     }
     None
+}
+
+fn divergence_count_to_color(diverged_at: Option<u32>) -> bmp::Pixel {
+    match diverged_at {
+        None => bmp::consts::BLACK,
+        Some(x) if x > 40 => bmp::consts::DARK_RED,
+        Some(x) if x > 20 => bmp::consts::RED,
+        Some(x) if x > 10 => bmp::consts::GRAY,
+        Some(_) => bmp::consts::WHITE,
+    }
 }
 
 fn main() {
@@ -32,10 +42,7 @@ fn main() {
     for (pixel_x, pixel_y) in img.coordinates() {
         let shift = pixel_to_complex(pixel_x, pixel_y, width, height);
         let diverged_at = steps_until_divergence(initial_value, shift);
-        let color = match diverged_at {
-            Some(_) => bmp::consts::WHITE,
-            None => bmp::consts::BLACK,
-        };
+        let color = divergence_count_to_color(diverged_at);
         img.set_pixel(pixel_x, pixel_y, color);
     }
     let _ = img.save("mandelbrot.bmp");
