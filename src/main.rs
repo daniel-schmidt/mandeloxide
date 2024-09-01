@@ -23,9 +23,6 @@ fn steps_until_divergence(initial_value: Complex, shift: Complex) -> Option<u8> 
 }
 
 fn main() {
-    let c = Complex::new(1.1, 0.2);
-    println!("Complex float: {}", c);
-
     let initial_value = Complex::new(0.0, 0.0);
 
     let width = 1920_u32;
